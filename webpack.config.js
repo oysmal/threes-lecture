@@ -23,12 +23,15 @@ const webpackConfig = {
     publicPath: CONFIG.dist.publicPath
   },
   plugins: [
-      new HtmlWebpackPlugin(),
+      new HtmlWebpackPlugin({
+          filname:'index.html',
+          template: path.resolve(CONFIG.src.path, 'index.html')
+      }),
       new CopyWebpackPlugin([
         {
             context: CONFIG.src.assets,
             from: '**/*',
-            to: CONFIG.publicPath
+            to: path.resolve(CONFIG.dist.path, CONFIG.dist.publicPath)
         }
     ])
   ]
