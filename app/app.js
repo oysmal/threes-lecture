@@ -51,13 +51,13 @@ export class App {
         // Perform the render of the scene from our camera's point of view
         this.renderer.render(this.state.scene, this.state.camera);
 
-        // this line loops the render call, remember to bind our context so we can access our stuff!
+        // This line loops the render call, remember to bind our context so we can access our stuff!
         window.requestAnimFrame(this.render.bind(this));
     }
 }
 
 
-// shim layer with setTimeout fallback (ignore this)
+// shim layer with setTimeout fallback for old browsers (ignore this)
 window.requestAnimFrame = (() => {
     return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||

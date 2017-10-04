@@ -1,5 +1,11 @@
 /**
- * Credit: https://github.com/jeromeetienne/threex.geometricglow
+ * Extended version of jeromeetienne's AtmosphereMaterial. The vertex shader requires a 
+ * float attribute "pulsePhase", which is used to offset the vertex position
+ * along the normal, by the magnitude specified by the pulseMagnitude uniform. 
+ * The pulsePhase is passed on to the fragment shader, where it is
+ * used for reducing the opacity along with the increase of the pulsePhase.
+ * 
+ * Original Credit: https://github.com/jeromeetienne/threex.geometricglow (MIT-License)
  */
 
 const THREE = require('three')
@@ -14,15 +20,15 @@ export const createPulsingAtmosphereMaterial = () => {
 		'varying vec3	vVertexNormal;',
 
 		'varying vec4	vFragColor;',
-        'uniform float  pulsePercent;',
-        'attribute float pulseMagnitude;',
+        'uniform float  pulseMagnitude;',
+        'attribute float pulsePhase;',
         'varying float pulseMag;',
 
 		'void main(){',
 		'	vVertexNormal	= normalize(normalMatrix * normal);',
-		'	vec3 vPos = position + normal*pulseMagnitude*pulsePercent;',
+		'	vec3 vPos = position + normal*pulsePhase*pulseMagnitude;',
 		'	vVertexWorldPosition	= (modelMatrix * vec4(vPos, 1.0)).xyz;',
-        '   pulseMag = pulseMagnitude;',
+        '   pulseMag = pulsePhase;',
 		'	// set gl_Position',
 		'	gl_Position	= projectionMatrix * modelViewMatrix * vec4(vPos, 1.0);',
 		'}',
@@ -64,14 +70,13 @@ export const createPulsingAtmosphereMaterial = () => {
 				type	: "c",
 				value	: new THREE.Color('yellow')
 			},
-			pulsePercent	: {
+			pulseMagnitude	: {
 				type	: "f",
 				value	: 0.0
 			},
 		},
 		vertexShader	: vertexShader,
 		fragmentShader	: fragmentShader,
-		//blending	: THREE.AdditiveBlending,
 		transparent	: true,
 		depthWrite	: false,
 	});

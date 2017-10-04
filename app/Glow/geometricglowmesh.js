@@ -1,5 +1,9 @@
 /**
- * Credit: https://github.com/jeromeetienne/threex.geometricglow
+ * Extended version of jeromeetienne's GeometricGlowMesh, creating a halo-like glow 
+ * around the passed geometry, along with an animated shine based on manipulating vertices
+ * based on time.
+ * 
+ * Original Credit: https://github.com/jeromeetienne/threex.geometricglow (MIT-License)
  */
 
 const THREE = require('three')
@@ -28,20 +32,20 @@ export class GeometricGlowMesh {
         material.uniforms.glowColor.value = new THREE.Color('yellow')
         material.uniforms.coeficient.value = 0.01
         material.uniforms.power.value = 3.0
-        material.uniforms.pulsePercent.value = 0.0;
+        material.uniforms.pulseMagnitude.value = 0.0;
         material.side = THREE.BackSide
         this.outsideMesh = new THREE.Mesh( geometry, material );
         this.object3d.add(this.outsideMesh);
 
-        this.pulseMagnitudeArray = [];
+        this.pulsePhaseArray = [];
         this.direction = [];
         for(let i = 0; i<this.outsideMesh.geometry.attributes.position.count; i++) {
             this.direction.push(Math.round(Math.random()));
-            this.pulseMagnitudeArray.push(Math.random())
+            this.pulsePhaseArray.push(Math.random())
         }
     
-        this.pulseMagnitudeBufferAttribute = new THREE.BufferAttribute(new Float32Array(this.pulseMagnitudeArray), 1);
-        this.outsideMesh.geometry.addAttribute('pulseMagnitude', this.pulseMagnitudeBufferAttribute);
+        this.pulsePhaseBufferAttribute = new THREE.BufferAttribute(new Float32Array(this.pulsePhaseArray), 1);
+        this.outsideMesh.geometry.addAttribute('pulsePhase', this.pulsePhaseBufferAttribute);
 
         this.millisecondsLast = new Date().getTime();
         this.period = 500;
@@ -50,26 +54,26 @@ export class GeometricGlowMesh {
 
     animate() {
         let timeDiff = new Date().getTime()-this.millisecondsLast;
-        for(let i = 0; i < this.pulseMagnitudeArray.length; i++) {
+        for(let i = 0; i < this.pulsePhaseArray.length; i++) {
 
             if(this.direction[i] == 1) {
-                this.outsideMesh.geometry.attributes.pulseMagnitude.array[i] += Math.random()*timeDiff/this.period;
-                if (this.outsideMesh.geometry.attributes.pulseMagnitude.array[i] > 1) {
-                    this.outsideMesh.geometry.attributes.pulseMagnitude.array[i] = 1;
+                this.outsideMesh.geometry.attributes.pulsePhase.array[i] += Math.random()*timeDiff/this.period;
+                if (this.outsideMesh.geometry.attributes.pulsePhase.array[i] > 1) {
+                    this.outsideMesh.geometry.attributes.pulsePhase.array[i] = 1;
                     this.direction[i] = -1;
                 }
             } else {
-                this.outsideMesh.geometry.attributes.pulseMagnitude.array[i] -= Math.random()*timeDiff/this.period;
-                if (this.outsideMesh.geometry.attributes.pulseMagnitude.array[i] < 0) {
-                    this.outsideMesh.geometry.attributes.pulseMagnitude.array[i] = 0;
+                this.outsideMesh.geometry.attributes.pulsePhase.array[i] -= Math.random()*timeDiff/this.period;
+                if (this.outsideMesh.geometry.attributes.pulsePhase.array[i] < 0) {
+                    this.outsideMesh.geometry.attributes.pulsePhase.array[i] = 0;
                     this.direction[i] = 1;
                 }
             }
         }
        // console.log(this.outsideMesh.geometry.attributes.pulseMagnitude.array)
-        this.outsideMesh.geometry.attributes.pulseMagnitude.needsUpdate = true;
-        this.outsideMesh.material.uniforms.pulsePercent.value = 2.0;
-        this.outsideMesh.material.uniforms.pulsePercent.needsUpdate = true;
+        this.outsideMesh.geometry.attributes.pulsePhase.needsUpdate = true;
+        this.outsideMesh.material.uniforms.pulseMagnitude.value = 2.0;
+        this.outsideMesh.material.uniforms.pulseMagnitude.needsUpdate = true;
         this.millisecondsLast = new Date();
     }
 }

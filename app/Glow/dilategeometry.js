@@ -1,5 +1,5 @@
 /**
- * Credit: https://github.com/jeromeetienne/threex.geometricglow
+ * Original Credit: https://github.com/jeromeetienne/threex.geometricglow (MIT-License)
  */
 
 const THREE = require('three');
