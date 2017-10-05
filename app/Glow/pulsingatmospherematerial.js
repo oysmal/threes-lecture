@@ -15,44 +15,43 @@ const THREE = require('three')
  * @return {[type]} [description]
  */
 export const createPulsingAtmosphereMaterial = () => {
-	var vertexShader	= [
-		'varying vec3	vVertexWorldPosition;',
-		'varying vec3	vVertexNormal;',
+	var vertexShader = `
+		varying vec3 vVertexWorldPosition;
+		varying vec3 vVertexNormal;
 
-		'varying vec4	vFragColor;',
-        'uniform float  pulseMagnitude;',
-        'attribute float pulsePhase;',
-        'varying float pulseMag;',
+		varying vec4 vFragColor;
+        uniform float pulseMagnitude;
+        attribute float pulsePhase;
+        varying float pulseMag;
 
-		'void main(){',
-		'	vVertexNormal	= normalize(normalMatrix * normal);',
-		'	vec3 vPos = position + normal*pulsePhase*pulseMagnitude;',
-		'	vVertexWorldPosition	= (modelMatrix * vec4(vPos, 1.0)).xyz;',
-        '   pulseMag = pulsePhase;',
-		'	// set gl_Position',
-		'	gl_Position	= projectionMatrix * modelViewMatrix * vec4(vPos, 1.0);',
-		'}',
+		void main() {
+			vVertexNormal = normalize(normalMatrix * normal);
+			vec3 vPos = position + normal*pulsePhase*pulseMagnitude;
+			vVertexWorldPosition = (modelMatrix * vec4(vPos, 1.0)).xyz;
+            pulseMag = pulsePhase;
+			// set gl_Position
+			gl_Position	= projectionMatrix * modelViewMatrix * vec4(vPos, 1.0);
+		}
+	`;
+	var fragmentShader	= `
+		uniform vec3 glowColor;
+		uniform float coeficient;
+		uniform float power;
 
-		].join('\n')
-	var fragmentShader	= [
-		'uniform vec3	glowColor;',
-		'uniform float	coeficient;',
-		'uniform float	power;',
+		varying vec3 vVertexNormal;
+		varying vec3 vVertexWorldPosition;
 
-		'varying vec3	vVertexNormal;',
-		'varying vec3	vVertexWorldPosition;',
+		varying vec4 vFragColor;
+        varying float pulseMag;
 
-		'varying vec4	vFragColor;',
-        'varying float pulseMag;',
-
-		'void main(){',
-		'	vec3 worldCameraToVertex= vVertexWorldPosition - cameraPosition;',
-		'	vec3 viewCameraToVertex	= (viewMatrix * vec4(worldCameraToVertex, 0.0)).xyz;',
-		'	viewCameraToVertex	= normalize(viewCameraToVertex);',
-		'	float intensity		= pow(coeficient + dot(vVertexNormal, viewCameraToVertex), power)*(1.0-pulseMag);',
-		'	gl_FragColor		= vec4(glowColor, intensity);',
-		'}',
-	].join('\n')
+		void main() {
+			vec3 worldCameraToVertex = vVertexWorldPosition - cameraPosition;
+			vec3 viewCameraToVertex	= (viewMatrix * vec4(worldCameraToVertex, 0.0)).xyz;
+			viewCameraToVertex = normalize(viewCameraToVertex);
+			float intensity	= pow(coeficient + dot(vVertexNormal, viewCameraToVertex), power)*(1.0-pulseMag);
+			gl_FragColor = vec4(glowColor, intensity);
+		}
+	`;
 
 	// create custom material from the shader code above
 	//   that is within specially labeled script tags
